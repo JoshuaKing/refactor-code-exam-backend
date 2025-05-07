@@ -1,5 +1,5 @@
 export function getAmocToStateId(state: string): string {
-  switch (state) {
+  switch (state) { // Replace with StateIds[state] || 'unk' - or better just undefined/error if invalid
     case "NT":
       return "IDD";
     case "NSW":

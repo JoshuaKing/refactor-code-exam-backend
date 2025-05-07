@@ -1,4 +1,4 @@
-import { parseXml } from "./parser";
+import { parser } from "./parser";
 import fs from "fs";
 import path from "path";
 
@@ -6,7 +6,7 @@ describe("parsing xml", () => {
   it("should parse xml", (done) => {
     const xml = fs.readFileSync(path.resolve(__dirname, "./IDD10307.amoc.xml"));
 
-    parseXml(xml.toString(), (json) => {
+    parser.parseString(xml.toString(), (error, json) => {
       console.log(JSON.stringify(json, null, 2));
       expect(json).toEqual({
         amoc: {

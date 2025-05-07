@@ -1,12 +1,9 @@
-import { downloadTo } from "basic-ftp/dist/transfer";
 import express from "express";
-import { getWarnings } from "./floods/amoc";
+import {Amoc} from "./floods/amoc";
 import { Downloader } from "./floods/Downloader";
-import { getAmocToStateId } from "./getAmocToStateId";
+import { getAmocToStateId } from "./floods/getAmocToStateId";
 import { FloodWarningParser } from "./parser/floodWarning";
-import { parseXml } from "./parser/parser";
-
-require("./logger.ts");
+import "./logger";
 
 const app = express();
 const port = 3000;
@@ -15,12 +12,12 @@ const ERRORMESSAGE = "Something went wrong";
 
 app.get("/", async (req, res) => {
   try {
-    const data = await getWarnings();
+    const data = await Amoc.get().getWarnings();
 
     const state = getAmocToStateId(req.query.state?.toString() || "");
 
     let results = [];
-    for (let key in data) {
+    for (const key of data) {
       if (key.startsWith(state)) {
         results.push(key.replace(/\.amoc\.xml/, ""));
       }
@@ -42,13 +39,19 @@ app.get("/warning/:id", async (req, res) => {
     const warningParser = new FloodWarningParser(warning);
     const text = await downloader.downloadText(xmlid);
 
-    res.send({ ...(await warningParser.getWarning()), text: text || "" });
+    res.send({ ...(await warningParser.getWarning()), text: text || "" }); // spread op, and text || '' shouldnt have any affect (would replace return value of '' with supplied '' though)
   } catch (error) {
     console.log(error);
-    res.send(ERRORMESSAGE);
+    res.send(ERRORMESSAGE); // would be 200 OK instead of HTTP error status code
   }
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+async function setup() {
+  await Amoc.get().setup();
+  app.listen(port, () => {
+    console.log(`Example app listening at http://localhost:${port}`);
+  });
+}
+
+
+setup();

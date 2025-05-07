@@ -1,0 +1,16 @@
+export enum ProductType {
+    A = "Advice",
+    B = "Bundle",
+    C = "Climate",
+    D = "Metadata",
+    E = "Analysis",
+    F = "Forecast",
+    M = "Numerical Weather Prediction",
+    O = "Observation",
+    Q = "Reference",
+    R = "Radar",
+    S = "Special",
+    T = "Satellite",
+    W = "Warning",
+    X = "Mixed",
+}

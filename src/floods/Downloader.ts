@@ -17,26 +17,27 @@ export class Downloader {
       const files = await client.list();
 
       for (var file in files) {
-        if (files[file].name.endsWith(".amoc.xml")) {
+        if (files[file].name.endsWith(".amoc.xml")) { // redundant due to later checks
           if (`${key}.amoc.xml` == files[file].name) {
-            await client.download(`./${key}.xml`, files[file].name);
+            await client.download(`./${key}.xml`, files[file].name); // Is .name correct? Arg should be path
           }
         }
       }
       client.close();
 
-      const data = this.readData(key);
+      const data = this.readData(key); // slow to read in entire file into memory in sync. Disagree on passing around key
 
       return data;
     } catch (err) {
-      console.log(key + " file not found");
-      return "";
+      console.log(key + " file not found"); // not displaying err value anywhere
+      return ""; // returning before .close(), also probably better to return undefined or throw or use other type
     }
 
-    client.close();
+    client.close(); // Unused
   }
 
-  readData(key: string): string {
+  // public method
+  readData(key: string): string { // only used once because it's so specific (.xml and key)
     return fs.readFileSync(`./${key}.xml`, { encoding: "utf-8" });
   }
 
@@ -59,7 +60,7 @@ export class Downloader {
       });
     } catch (err) {
       console.log(key + " file not found");
-      return "";
+      return ""; // close connection
     }
 
     client.close();
