@@ -68,7 +68,7 @@ export const options = {
 };
 
 export function breakpoint_concurrent_vus() {
-    const res = http.get('http://localhost:3000/?state=Qld')
+    const res = http.get('http://localhost:3000/state/Qld')
     check(res, {
         'success qld': (r) => r.status === 200,
         'content qld': (r) => r.body && r.body.length > 2,

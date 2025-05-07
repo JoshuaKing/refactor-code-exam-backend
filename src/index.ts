@@ -10,21 +10,23 @@ const port = 3000;
 
 const ERROR_MESSAGE = "Something went wrong";
 
-app.get("/", async (req, res) => {
+app.get("/state/:state", async (req, res, next) => {
   try {
     const data = await Amoc.get().getWarnings();
 
-    const state = getAmocToStateId(req.query.state?.toString() || "");
+    const state = getAmocToStateId(req.params.state);
+    if (!data.has(state)) {
+      throw new Error(`Invalid State Value: ${state}`)
+    }
 
     let results = data.get(state) ?? [];
     res.send(results);
   } catch (error) {
-    console.error(error);
-    res.send(ERROR_MESSAGE);
+    next(error)
   }
 });
 
-app.get("/warning/:id", async (req, res) => {
+app.get("/warning/:id", async (req, res, next) => {
   try {
     const downloader = new Downloader();
     const xmlid = req.params.id;
@@ -35,10 +37,15 @@ app.get("/warning/:id", async (req, res) => {
 
     res.send({ ...(await warningParser.getWarning()), text: text || "" }); // spread op, and text || '' shouldnt have any affect (would replace return value of '' with supplied '' though)
   } catch (error) {
-    console.error(error);
-    res.send(ERROR_MESSAGE); // would be 200 OK instead of HTTP error status code
+    next(error)
   }
 });
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  console.error('Express Error Handler');
+  res.status(err.status ?? 500).send({ error: ERROR_MESSAGE });
+})
 
 async function setup() {
   await Amoc.get().setup();

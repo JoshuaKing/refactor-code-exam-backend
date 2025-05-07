@@ -99,6 +99,9 @@
   - Try not to do this on each individual machine - scaling will make this messy. Share results from a single scheduled instance/lambda to cache/db/EFS
 - What if files are large XML?
   - ETL perhaps - potentially alter to host XML on S3 - then return S3 signed URL through API
+- Replace logger with industry standard/lib specialised
+ - console logging may be synchronous, not handle encodings, lack timing data, may not handle multiple threads or processes etc
+- Make / endpoint /state/:state
 
 # Load Test
 - Small modifications for getWarnings (still searches for state each req)
