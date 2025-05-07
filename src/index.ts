@@ -1,4 +1,5 @@
 import express from "express";
+import expressCache from "cache-express";
 import {Amoc} from "./floods/amoc";
 import { Downloader } from "./floods/Downloader";
 import { getAmocToStateId } from "./floods/getAmocToStateId";
@@ -26,7 +27,7 @@ app.get("/state/:state", async (req, res, next) => {
   }
 });
 
-app.get("/warning/:id", async (req, res, next) => {
+app.get("/warning/:id", expressCache(), async (req, res, next) => {
   try {
     const downloader = new Downloader();
     const xmlid = req.params.id;

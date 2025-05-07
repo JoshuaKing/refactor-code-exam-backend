@@ -34,6 +34,7 @@ export const options = {
             timeUnit: '1s',
             startRate: 1000,
             maxVUs: 10000,
+            startTime: '10m',
             stages: [
                 { duration: '30s', target: 1000*2 },
                 { duration: '60s', target: 1000*4 },
@@ -42,18 +43,18 @@ export const options = {
                 { duration: '120s', target: 1000*32 },
                 { duration: '600s', target: 1000*1024 },
             ],
-            startTime: '10m'
         },
         breakpoint_concurrent_vus_lookup: {
             executor: 'ramping-arrival-rate',
             exec: 'breakpoint_concurrent_vus_lookup',
             preAllocatedVUs: 10000,
             timeUnit: '1s',
-            startRate: 100,
+            startRate: 1000,
             maxVUs: 10000,
+            startTime: '0',
             stages: [
-                { duration: '60s', target: 1000 },
-                { duration: '60s', target: 1000*2 },
+                { duration: '30s', target: 1000*2 },
+                { duration: '60s', target: 1000*4 },
                 { duration: '120s', target: 1000*8 },
                 { duration: '120s', target: 1000*16 },
                 { duration: '120s', target: 1000*32 },
@@ -79,5 +80,12 @@ export function breakpoint_concurrent_vus_lookup() {
     check(res, {
         'success IDQ10090': (r) => r.status === 200,
         'content IDQ10090': (r) => r.body && r.body.length > 2,
+    })
+}
+export function breakpoint_concurrent_vus_rng_lookup() { // lookup random IDs from list - lots of cache misses
+    const res = http.get('http://localhost:3000/warning/xxxx')
+    check(res, {
+        'success XXXX': (r) => r.status === 200,
+        'content XXXX': (r) => r.body && r.body.length > 2,
     })
 }

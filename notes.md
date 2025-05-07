@@ -102,6 +102,7 @@
 - Replace logger with industry standard/lib specialised
  - console logging may be synchronous, not handle encodings, lack timing data, may not handle multiple threads or processes etc
 - Make / endpoint /state/:state
+- Fix vulnerabilities in npm packages (at least if in prod packages)
 
 # Load Test
 - Small modifications for getWarnings (still searches for state each req)

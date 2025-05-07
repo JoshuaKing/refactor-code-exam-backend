@@ -35,9 +35,11 @@ export class Amoc {
       for (const file of files) {
         const match = file.name.match(/(.{3})(.*)\.amoc\.xml$/)
         if (match?.length) {
-          const stateWarnings = this.warnings.get(match[1]) ?? [];
-          stateWarnings.push((match[1] + match[2]))
-          this.warnings.set(match[1], stateWarnings);
+          const stateIdPrefix = match[1];
+          const fileIdSuffix = match[2];
+          const stateWarnings = this.warnings.get(stateIdPrefix) ?? [];
+          stateWarnings.push((stateIdPrefix + fileIdSuffix))
+          this.warnings.set(stateIdPrefix, stateWarnings);
         }
       }
       this.isSetup = true;
