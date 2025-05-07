@@ -112,3 +112,20 @@
    - 2.39% err
    - p95 = 5ms
  - 99% @300vus (0.27% err)
+- Using map for state warning lookups - no searching of lists
+  - @1000vus - 93% still (6.75% err), and similar resp duration
+  - p95 for 100vus - 0.5ms
+  - @300vus - 0.06% err, 3.7ms resp
+- w/ulimit -n 1024 (up from 256)
+  - @1000vus - 89% - 11% err, p95=80ms
+- w/ulimit -n 2048 (4096 is too many)
+  - @1000vus - similar results as 1024
+  - (closing ff) @1000vus and 10k iterations - only 0.9% err
+## Breakpoint /?state=Qld
+- includes changes to ftp and map lookup for warnings
+- ulimit=2048, max 10k vus, p95<1s and cache-express package
+  - breakpoint at 6176 iterations/s (p95>1s triggered), p95=1.17, max=1.72s, no errors
+- remove cache-express package
+  - breakpoint at 6440 iterations/s (p95>1s triggered), p95=1.09, max=1.74s, no errors
+- revert state search
+  - breakpoint at 6440 iterations/s (p95>1s triggered), p95=1.09, max=1.74s, no errors

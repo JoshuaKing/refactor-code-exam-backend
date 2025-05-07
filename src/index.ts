@@ -4,6 +4,7 @@ import { Downloader } from "./floods/Downloader";
 import { getAmocToStateId } from "./floods/getAmocToStateId";
 import { FloodWarningParser } from "./parser/floodWarning";
 import "./logger";
+import expressCache from "cache-express";
 
 const app = express();
 const port = 3000;
@@ -16,12 +17,7 @@ app.get("/", async (req, res) => {
 
     const state = getAmocToStateId(req.query.state?.toString() || "");
 
-    let results = [];
-    for (const key of data) {
-      if (key.startsWith(state)) {
-        results.push(key.replace(/\.amoc\.xml/, ""));
-      }
-    }
+    let results = data.get(state) ?? [];
 
     res.send(results);
   } catch (error) {

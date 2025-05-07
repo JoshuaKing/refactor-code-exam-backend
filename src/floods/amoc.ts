@@ -11,7 +11,7 @@ export class Amoc {
     }
   };
   private isSetup = false;
-  private warnings: string[] = [];
+  private warnings: Map<string, string[]> = new Map();
 
   static get(): Amoc {
     return Amoc._instance ?? (Amoc._instance = new Amoc(new Client(), Amoc._config));
@@ -33,9 +33,11 @@ export class Amoc {
       const files = await this.client.list(this.config.ftp.path);
 
       for (const file of files) {
-        const match = file.name.match(/(.*)\.amoc\.xml$/)
+        const match = file.name.match(/(.{3})(.*)\.amoc\.xml$/)
         if (match?.length) {
-          this.warnings.push(match[1]);
+          const stateWarnings = this.warnings.get(match[1]) ?? [];
+          stateWarnings.push((match[1] + match[2]))
+          this.warnings.set(match[1], stateWarnings);
         }
       }
       this.isSetup = true;
@@ -51,7 +53,7 @@ export class Amoc {
     await this.client.close();
   }
 
-  public async getWarnings(): Promise<string[]> {
+  public async getWarnings(): Promise<typeof this.warnings> {
       await this.setup();
       return this.warnings;
   }
