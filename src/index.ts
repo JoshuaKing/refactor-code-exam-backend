@@ -43,7 +43,6 @@ app.get("/warning/:id", async (req, res, next) => {
 
 app.use((err, req, res, next) => {
   console.error(err);
-  console.error('Express Error Handler');
   res.status(err.status ?? 500).send({ error: ERROR_MESSAGE });
 })
 
