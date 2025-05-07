@@ -41,6 +41,23 @@ export const options = {
                 { duration: '120s', target: 1000*16 },
                 { duration: '120s', target: 1000*32 },
                 { duration: '600s', target: 1000*1024 },
+            ],
+            startTime: '10m'
+        },
+        breakpoint_concurrent_vus_lookup: {
+            executor: 'ramping-arrival-rate',
+            exec: 'breakpoint_concurrent_vus_lookup',
+            preAllocatedVUs: 10000,
+            timeUnit: '1s',
+            startRate: 100,
+            maxVUs: 10000,
+            stages: [
+                { duration: '60s', target: 1000 },
+                { duration: '60s', target: 1000*2 },
+                { duration: '120s', target: 1000*8 },
+                { duration: '120s', target: 1000*16 },
+                { duration: '120s', target: 1000*32 },
+                { duration: '600s', target: 1000*1024 },
             ]
         }
     },
@@ -55,5 +72,12 @@ export function breakpoint_concurrent_vus() {
     check(res, {
         'success qld': (r) => r.status === 200,
         'content qld': (r) => r.body && r.body.length > 2,
+    })
+}
+export function breakpoint_concurrent_vus_lookup() {
+    const res = http.get('http://localhost:3000/warning/IDQ10090')
+    check(res, {
+        'success IDQ10090': (r) => r.status === 200,
+        'content IDQ10090': (r) => r.body && r.body.length > 2,
     })
 }

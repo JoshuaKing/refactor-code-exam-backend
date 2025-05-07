@@ -4,12 +4,11 @@ import { Downloader } from "./floods/Downloader";
 import { getAmocToStateId } from "./floods/getAmocToStateId";
 import { FloodWarningParser } from "./parser/floodWarning";
 import "./logger";
-import expressCache from "cache-express";
 
 const app = express();
 const port = 3000;
 
-const ERRORMESSAGE = "Something went wrong";
+const ERROR_MESSAGE = "Something went wrong";
 
 app.get("/", async (req, res) => {
   try {
@@ -18,11 +17,10 @@ app.get("/", async (req, res) => {
     const state = getAmocToStateId(req.query.state?.toString() || "");
 
     let results = data.get(state) ?? [];
-
     res.send(results);
   } catch (error) {
-    console.log(error);
-    res.send(ERRORMESSAGE);
+    console.error(error);
+    res.send(ERROR_MESSAGE);
   }
 });
 
@@ -37,8 +35,8 @@ app.get("/warning/:id", async (req, res) => {
 
     res.send({ ...(await warningParser.getWarning()), text: text || "" }); // spread op, and text || '' shouldnt have any affect (would replace return value of '' with supplied '' though)
   } catch (error) {
-    console.log(error);
-    res.send(ERRORMESSAGE); // would be 200 OK instead of HTTP error status code
+    console.error(error);
+    res.send(ERROR_MESSAGE); // would be 200 OK instead of HTTP error status code
   }
 });
 

@@ -128,4 +128,11 @@
 - remove cache-express package
   - breakpoint at 6440 iterations/s (p95>1s triggered), p95=1.09, max=1.74s, no errors
 - revert state search
-  - breakpoint at 6440 iterations/s (p95>1s triggered), p95=1.09, max=1.74s, no errors
+  - breakpoint at 6441 iterations/s (p95>1s triggered), p95=1.16, max=1.79s, no errors
+- ~no changes for root endpoint
+  - near immediate failures - 1100it/s, 48% errors, timing out in ftp connections server-side
+  - made easy-mode. fails at 350/s, content failures 99%, p95=7.07s, max=15.5s (~1400vus)
+## Breakpoint /warning/IDQ10090
+- ~no changes for warning endpoint
+  - easy mode. fails at 168it/s, p95=2.2s, max=2.9s, (~370vus) 
+- 

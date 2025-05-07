@@ -1,26 +1,29 @@
 import fs from "fs";
 
 if (process.env.NODE_ENV == "production") {
-  let stdLogger = console.log;
-  let stdError = console.error;
+  const stdOut = process.stdout.write;
+  const stdErr = process.stderr.write;
 
-  var logFile = fs.createWriteStream("logs.log", { flags: "a" });
+  const logFile = fs.createWriteStream("logs.log", { flags: "a" });
 
-  console.log = function (...args) {
-    stdLogger(args);
+  process.stdout.write = function<T extends Parameters<typeof process.stdout.write>>(args: T) {
 
     if (logFile.writable) {
-      logFile.write(JSON.stringify(args));
-      logFile.write("\n");
+      logFile.write.apply(logFile, ['STDOUT: ' + JSON.stringify(args) + '\n', 'utf8']);
+    } else {
+      stdErr.apply(process.stderr, ['LogFile Not Writable']);
+      process.exit(-1);
     }
+    return stdOut.apply(process.stdout, Array.isArray(args) ? args : [args]);
   };
 
-  console.error = function (...args) {
-    stdError(args);
-
+  process.stderr.write = function<T extends Parameters<typeof process.stderr.write>>(args: T) {
     if (logFile.writable) {
-      logFile.write(JSON.stringify(args));
-      logFile.write("\n");
+      logFile.write.apply(logFile, ['STDERR: ' + JSON.stringify(args) + '\n', 'utf8']);
+    } else {
+      stdErr.apply(process.stderr, ['LogFile Not Writable']);
+      process.exit(-1);
     }
+    return stdErr.apply(process.stderr, Array.isArray(args) ? args : [args]);
   };
 }

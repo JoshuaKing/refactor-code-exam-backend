@@ -4,7 +4,7 @@
   "description": "In this scenario pretend you have just inherited this codebase from the business. Its been running in production for the last 18 months. It was developed by a 3rd party contractor and once the project was completed they moved on and are no longer contactable. Its been decided that you are the new owner of this project. At the moment you have no new requirements but you have been told in the near future this project is going to be critical for an important client. This client will want new features and to dramatically increase the current traffic load. Your job is to get the project ready for that.",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production ts-node src/index.ts",
+    "start": "set NODE_ENV=production& ts-node src/index.ts",
     "test": "jest",
     "dev": "nodemon"
   },
@@ -20,7 +20,6 @@
     "@types/express": "^4.17.13",
     "@types/jest": "^29.5.14",
     "basic-ftp": "^4.6.6",
-    "cache-express": "^1.0.2",
     "express": "^4.17.1",
     "jest": "^29.7.0",
     "nodemon": "^2.0.12",
