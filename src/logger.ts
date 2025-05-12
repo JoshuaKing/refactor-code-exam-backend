@@ -7,7 +7,6 @@ if (process.env.NODE_ENV == "production") {
   const logFile = fs.createWriteStream("logs.log", { flags: "a" });
 
   process.stdout.write = function<T extends Parameters<typeof process.stdout.write>>(args: T) {
-
     if (logFile.writable) {
       logFile.write.apply(logFile, ['STDOUT: ' + JSON.stringify(args) + '\n', 'utf8']);
     } else {

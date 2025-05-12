@@ -139,7 +139,9 @@
   - made easy-mode. fails at 350/s, content failures 99%, p95=7.07s, max=15.5s (~1400vus)
 ## Breakpoint /warning/IDQ10090
 - ~no changes for warning endpoint
-  - easy mode. fails at 168it/s, p95=2.2s, max=2.9s, (~370vus) 
+  - easy mode. fails at 168it/s, p95=2.2s, max=2.9s, (~370vus)
+- With cache, subsequent hits fail at about the same 6k it/s
+- To make 1000x performant: 28 servers to get 168*1000 it/s (dependent on file being DL first)
 
 
 # Present
@@ -148,7 +150,7 @@
 > Determine the 5 most critical parts of the project that need changing
 > based on the scenario above. For each one, consider the changes that 
 > you would make to improve the codebase.
-- Redundant FTP
+- Redundant FTP processing
   - What
     - Re-connecting to FTP server for every request (both endpoints, index.ts)
     - Re-downloading existing files (Download.ts/Amoc.ts)
@@ -171,19 +173,12 @@
     - Add cache/DB for multiple servers to utilise - eg. DynamoDB/+DAX or perhaps elasticache for small data
       - If large (400kb+ for ddb, cache RAM cost for elasticache), could use S3 links instead of direct content results
       - If cannot alter frontend/api contract, connected EFS volumes or S3 download (w/multipart DL, same region, and Transfer Acceleration on bucket+Client endpoints)
-- Smaller Code Issues?
-  - REST endpoint for state warnings
-  - Memory leak with not closing FTP connections
-  - NestJS + standardisation efforts (eg. REST, and )
-  - Replace Logger (particularly to handle microservice/large scale deployments/concurrency)
-  - Enums (and fixing switch statements) and mixed-case state values
-  - Logger multiple .write() without draining
 - Add CICD
   - Vuln. scanning (Fix 2 Crit. Vulns)
   - Automated incremental upgrades
   - Test coverage + Code Smells (eg. unused code, duplicate code, using deprecated fns)
   - Containerise for deployment (eg. Fargate, Lambda, or ECS/EKS)
-- Production not running `npm install`, no node version, using ts-node instead of compiling, (npm dev using npx in nodemon), (and logging in prod wouldn't work?)
+- Production not running `npm install`, no node version, using ts-node instead of compiling, (npm dev using npx in nodemon), (and logging in prod wouldn't work well)
   - Why
     - Packages arent installed for prod
     - Slower, especially at boot or new request/file - could be significant if starting many servers
@@ -191,7 +186,7 @@
     - prod/dev using mismatched node version causing issues
   - How
     - 'engines' package.json
-    - npm install --production (in CICD)
+    - npm install --production (in CICD) and other build scripts
 - Use secure protocols
   - What
     - FTPS (or pref. a more efficient API) for BOM files, and upgrading and fixing critical vulns
@@ -202,6 +197,13 @@
   - How
     - If unable to use FTPS, perhaps use firewalls/security groups to ensure correct IP
     - If available, use REST API etc. May even help with caching content (eg. pre-check with server if content has changed)
+- Smaller Code Issues?
+  - REST endpoint for state warnings
+  - Memory leak with not closing FTP connections
+  - NestJS + standardisation efforts
+  - Replace Logger (particularly to handle microservice/large scale deployments/concurrency)
+  - Enums (and fixing switch statements) and mixed-case state values
+  - Logger multiple .write() without draining
 ## What changes would be made (if any) for 1000x load + new features + critical
 >Consider the application's architecture and production run time and 
 > think about what changes would you make (if any) to accommodate the 
@@ -209,9 +211,14 @@
 - Replace logger (pref. with class)
   - Setup + Use CloudWatch Logs for aggregation
   - Eg. aws-cloudwatch-log package
-- Use cluster or pm2 if on multiple-core CPU (and check memory-limits)
-- Utilise caching where possible (pref. on edge w/something like API Gateway or CloudFront)
-- For files: Pre-Download; DB-store; or S3-link
+  - Timing, request IDs, server IDs, etc
+- Use cluster or pm2 if on multiple-core CPU (and check memory-limits, open file descriptor limits)
+- Utilise caching where possible
+  - pref. on edge w/something like API Gateway or CloudFront to limit compute reqs
+- Consider Deployment
+  - Build scripts, CICD, tests
+  - Potential containerisation w/EKS, or EC2, or Lambda, with EFS/DDB/memcached
+- For files: Pre-Download; DB-store; or S3-link. Potentially handle downloading w/single instance through SQS or Scheduling (if Push not available)
   - Could be checked on any instance (but might be less performant or redundant/simultaneous checks)
   - Job to download (and process/store in DB/S3) could be added to queue (event driven). In which case, GET could long-wait, or poll from frontend
 - Front HTTPS (may already be the case) - Use ELB or API Gateway and AWS Certificate Manager + Route53
