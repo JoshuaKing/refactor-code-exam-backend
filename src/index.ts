@@ -36,7 +36,9 @@ app.get("/warning/:id", expressCache(), async (req, res, next) => {
     const warningParser = new FloodWarningParser(warning);
     const text = await downloader.downloadText(xmlid);
 
-    res.send({ ...(await warningParser.getWarning()), text: text || "" }); // spread op, and text || '' shouldnt have any affect (would replace return value of '' with supplied '' though)
+    let warningJson = await warningParser.getWarning();
+    warningJson['text'] = text || "";
+    res.send(warningJson); // spread op, and text || '' shouldnt have any affect (would replace return value of '' with supplied '' though)
   } catch (error) {
     next(error)
   }
@@ -45,11 +47,11 @@ app.get("/warning/:id", expressCache(), async (req, res, next) => {
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(err.status ?? 500).send({ error: ERROR_MESSAGE });
-})
+});
 
 async function setup() {
   await Amoc.get().setup();
-  app.listen(port, () => {
+  app.listen(port, 'localhost', 4096, () => {
     console.log(`Example app listening at http://localhost:${port}`);
   });
 }
